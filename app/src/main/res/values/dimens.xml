@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="container_width">340dp</dimen>
+    <dimen name="container_height">480dp</dimen>
+    <dimen name="container_margin">10dp</dimen>
+
+    <dimen name="dialog_margin">25dp</dimen>
+    <dimen name="dialog_top_margin">45dp</dimen>
+</resources>

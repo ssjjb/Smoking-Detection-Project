@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="signup_go">50dp</dimen>
+    <dimen name="signup_text">20dp</dimen>
+    <dimen name="data_detail_content">70dp</dimen>
+</resources>

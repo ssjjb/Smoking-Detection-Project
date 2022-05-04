@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">SmokingApp</string>
+    <string name="email">E\-mail</string>
+    <string name="password">Password</string>
+    <string name="login">Log-In</string>
+    <string name="signup">Sign-Up</string>
+    <string name="find">Find PW</string>
+    <string name="main_subtitle">This program is an application that detects smoking and informs the user</string>
+    <string name="name">Name</string>
+    <string name="back">Back</string>
+
+    <string name="login_error_email">Invalid Syntax.</string>
+    <string name="login_error_pw">No Matching Password.</string>
+    <string name="login_error_email_notexist">Not exist e-mail</string>
+
+    <string name="signup_error_email">Invalid Syntax.</string>
+    <string name="signup_error_name">Invalid Character.</string>
+    <string name="signup_error_pw">Only 6 to 20 Characters</string>
+    <string name="signup_error_email_duplicate">Duplicate E\-mail</string>
+
+    <string name="main_recordchk">See more...</string>
+    <string name="main_no_rec">No Record</string>
+    <string name="main_basic_name">My Location</string>
+    <string name="main_basic_detection_num">0 person detected</string>
+    <string name="main_basic_time">Last check: 2022.11.10 11:11</string>
+    <string name="main_basic_des">After last confirmation</string>
+    <string name="main_refresh">Refresh</string>
+    <string name="main_setting">Add Module</string>
+    <string name="main_logout">Logout</string>
+
+    <string name="data_recent">Recent</string>
+    <string name="data_history">History</string>
+    <string name="data_chart_today">Today</string>
+    <string name="data_chart_weekly">Weekly</string>
+    <string name="data_chart_monthly">Monthly</string>
+    <string name="data_chart_basic_day">21 September</string>
+    <string name="data_person">Today</string>
+    <string name="data_total">Total</string>
+    <string name="data_chart_total_static">Total of Smoking</string>
+    <string name="data_chart_day_static">Day of Smoking</string>
+
+    <string name="custom_person">Today Detected</string>
+    <string name="custom_detect">Total Detected</string>
+
+    <string name="setting_setting">Settings</string>
+    <string name="setting_account">ACCOUNT</string>
+    <string name="setting_dark">Dark Mode</string>
+    <string name="setting_logout">Logouts</string>
+    <string name="setting_edit_name">Edit Name</string>
+    <string name="setting_help">Help</string>
+    <string name="setting_noti">Notification</string>
+    <string name="setting_language">Language</string>
+    <string name="setting_system">SYSTEM</string>
+
+</resources>

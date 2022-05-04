@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">" 吸烟应用"</string>
+    <string name="email">" 电子邮件"</string>
+    <string name="password">密码</string>
+    <string name="login">登录</string>
+    <string name="signup">报名</string>
+    <string name="find">" 找到密码"</string>
+    <string name="main_subtitle">" 该程序是检测吸烟并通知用户的应用程序"</string>
+    <string name="name">" 姓名"</string>
+    <string name="back">向后</string>
+    <string name="login_error_email">无效的语法</string>
+    <string name="login_error_pw">" 没有匹配的密码"</string>
+    <string name="signup_error_email">无效的语法</string>
+    <string name="signup_error_name">" 无效字符"</string>
+    <string name="signup_error_pw">" 只有 6 到 20 个字符"</string>
+    <string name="signup_error_email_duplicate">" 重复的电子邮件"</string>
+    <string name="main_recordchk">看更多...</string>
+    <string name="main_basic_name">" 我的位置"</string>
+    <string name="main_no_rec">" 无记录"</string>
+    <string name="main_basic_detection_num">检测到 0 人</string>
+    <string name="main_basic_time">" 最后检查：2022.11.10 11:11"</string>
+    <string name="main_basic_des">最后确认后</string>
+    <string name="main_refresh">" 刷新"</string>
+    <string name="main_setting">" 环境"</string>
+    <string name="main_logout">登出</string>
+    <string name="data_recent">" 最近的"</string>
+    <string name="data_history">历史</string>
+    <string name="data_chart_today">今天</string>
+    <string name="data_chart_weekly">" 每周"</string>
+    <string name="data_chart_monthly">月刊</string>
+    <string name="data_chart_basic_day">9 月 21 日</string>
+    <string name="data_total">全部的</string>
+    <string name="data_person">今天</string>
+    <string name="data_chart_day_static">" 吸烟日"</string>
+    <string name="data_chart_total_static">" 吸烟总数"</string>
+    <string name="custom_person">" 今天检测到"</string>
+    <string name="custom_detect">" 检测到的总数"</string>
+    <string name="setting_setting">" 设置"</string>
+    <string name="setting_account">帐户</string>
+    <string name="setting_dark">黑暗模式</string>
+    <string name="setting_logout">" 注销"</string>
+    <string name="setting_edit_name">编辑名称</string>
+    <string name="setting_help">" 帮助"</string>
+    <string name="setting_noti">" 通知"</string>
+    <string name="setting_language">" 语言"</string>
+    <string name="setting_system">" 系统"</string>
+    <string name="login_error_email_notexist" translatable="false">" 不存在邮箱"</string>
+</resources>
