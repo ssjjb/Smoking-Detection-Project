@@ -1,24 +1,17 @@
 package com.example.smokingapp;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -31,30 +24,24 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.ArrayList;
-import java.util.Locale;
-
 public class MainActivity extends AppCompatActivity {
+    private static final int NUM_PAGES = 3;
+    private String[] titles = new String[]{"My Module", "Setting", "Log"};
 
     private DatabaseReference mDatabaseRef;
+    private Context context;
 
-    private static final int NUM_PAGES = 3;
-    public static Context context;
-
-    FloatingActionButton fab;
+    FloatingActionButton floatingActionButton;
     ViewPager2 viewPager;
     FragmentStateAdapter pagerAdapter;
     TabLayout tablayout;
-    private String[] titles = new String[]{"My Module", "Setting", "Log"};
 
-    // 로그아웃, 회원탈퇴, 비밀번호 변경
     //TextView logout, id_delete, pw_change;
     //EditView change_pw;
 
     // firebase 추가 코드
     private FirebaseAuth mAuth;
     private FirebaseUser User;
-    //private
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,32 +49,19 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         context = getApplicationContext();
+        viewCasting();
 
-        // find id
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        viewPager = (ViewPager2) findViewById(R.id.main_viewpager);
-        tablayout = (TabLayout) findViewById(R.id.main_tab);
-
-
-        pagerAdapter = new MyPagerAdapter(this);
-        viewPager.setAdapter(pagerAdapter);
-
-        // 로그아웃, 회원탈퇴, 비밀번호 변경
-        //logout = (TextView) findViewById(R.id.logout);
-        //id_delete = (TextView) findViewById(R.id.id_delete);
-        //pw_change = (TextView) findViewById(R.id.pw_change);  // 비밀번호 변경 클릭해주는 텍스트뷰
-        //change_pw = (EditView) findViewById(R.id.change_pw);  // 새로운 비밀번호 입력 받는 에디터뷰
-        
         // firebase 추가 코드
         mAuth = FirebaseAuth.getInstance();
         User = mAuth.getCurrentUser();
-
         mDatabaseRef = FirebaseDatabase.getInstance().getReference("SmokingApp");
 
+        pagerAdapter = new MyPagerAdapter(this);
+        viewPager.setAdapter(pagerAdapter);
         new TabLayoutMediator(tablayout, viewPager, (tab, position) -> tab.setText(titles[position])).attach();
 
-        // fab setting
-        fab.setOnClickListener(new View.OnClickListener() {
+        // floating action setting
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent fab_intent = new Intent(MainActivity.this, FabActivity.class);
@@ -95,10 +69,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /*
-        // 나중에 로그아웃 logout으로 추가해주세요 ~
-        // firebase 로그아웃 코드 ~
-        logout.setOnClickListener(new View.OnClickListener() {
+        // firebase logout
+        /*logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -107,10 +79,10 @@ public class MainActivity extends AppCompatActivity {
                 Intent t = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(t);
             }
-        });
+        });*/
 
-        // 나중에 회원탈퇴 id_delete로 추가해주세요 ~
-        // firebase 회원탙퇴 코드 ~
+        // firebase delete user
+        /*
         id_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,9 +93,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(t);
             }
         });
+         */
 
-        // 나중에 비밀번호 변경 pw_change로 추가해주세요 ~
-        // firebase 비밀번호 변경 코드 ~
+        // firebase change password
+        /*
         pw_change.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,8 +107,21 @@ public class MainActivity extends AppCompatActivity {
 
                 Intent t = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(t);
-        */
+            }
+        });
+         */
     }
+    private void viewCasting(){
+        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        viewPager = (ViewPager2) findViewById(R.id.main_viewpager);
+        tablayout = (TabLayout) findViewById(R.id.main_tab);
+
+        /*logout = (TextView) findViewById(R.id.logout);
+        id_delete = (TextView) findViewById(R.id.id_delete);
+        pw_change = (TextView) findViewById(R.id.pw_change);  // 비밀번호 변경 클릭해주는 텍스트뷰
+        change_pw = (EditView) findViewById(R.id.change_pw);  // 새로운 비밀번호 입력 받는 에디터뷰*/
+    }
+
     private class MyPagerAdapter extends FragmentStateAdapter {
         public MyPagerAdapter(FragmentActivity fa) {
             super(fa);
@@ -172,17 +158,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // firebase 로그아웃 코드
+    // firebase logout
     private void signOut() {
         mAuth.signOut();
     }
 
-    // firebase 회원탈퇴 코드
+    // firebase delete user
     private void id_delete() {
         User.delete();
     }
 
-    // firebase 비밀번호 변경 코드
+    // firebase change password
     private void pw_change(String new_password) {
         User.updatePassword(new_password)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {

@@ -6,14 +6,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,14 +20,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 public class FragmentModule extends Fragment {
-    RecyclerView module_container;
+    private Context context;
+
+    RecyclerView moduleContainer;
     ArrayList<Module> data;
-    Context context;
     public String ip = "";
 
     // firebase 인증 객체 선언
@@ -49,11 +45,10 @@ public class FragmentModule extends Fragment {
         // firebase
         mAuth = FirebaseAuth.getInstance();
 
-
         // view 선언
-        module_container = (RecyclerView) v.findViewById(R.id.main_module_container);
+        moduleContainer = (RecyclerView) v.findViewById(R.id.main_module_container);
 
-        module_container.setLayoutManager(new GridLayoutManager(context, 2));
+        moduleContainer.setLayoutManager(new GridLayoutManager(context, 2));
 
         InitDB();
 
@@ -124,7 +119,7 @@ public class FragmentModule extends Fragment {
 
 
                 MainAdapter adapter = new MainAdapter(data);
-                module_container.setAdapter(adapter);
+                moduleContainer.setAdapter(adapter);
 
             }
 

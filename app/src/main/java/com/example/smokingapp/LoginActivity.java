@@ -40,7 +40,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final boolean LOGIN = true;
     private static final boolean SIGNUP = false;
 
-    Context context;
+    private Context context;
 
     boolean isSignUpEmail, isSignUpName, isSignUpPassword, isLoginEmail, isLoginPassword;
     boolean isDuplicate;
