@@ -4,10 +4,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -25,21 +27,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CameraActivity extends AppCompatActivity{
-    Context context;
+    private Context context;
+    private Uri uri;
+
     private int device_width = 0;
     private int device_height = 0;
 
     LibVLC vlc;
     MediaPlayer player;
     VLCVideoLayout layout;
-    public static final Uri uri = Uri.parse("rtsp://192.168.137.202:8554/test");
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-        context = getApplicationContext();
+        context = this;
+        Intent intent = getIntent();
+        Log.e("camera", intent.getStringExtra("ip_address"));
+        uri = Uri.parse(intent.getStringExtra("ip_address"));
+
         layout = (VLCVideoLayout) findViewById(R.id.data_player);
 
         DisplayMetrics display = getApplicationContext().getResources().getDisplayMetrics();

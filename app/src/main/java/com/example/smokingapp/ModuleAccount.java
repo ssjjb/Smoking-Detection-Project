@@ -1,5 +1,8 @@
 package com.example.smokingapp;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  *    모듈 정보 모델 클래스
  */
@@ -8,7 +11,7 @@ public class ModuleAccount {
 
     private int day_detection_person = 0;         // 오늘 감지된 사람 수
     private int total_detection_person = 0;       // 전체 감지된 사람 수
-    private String last_detection_time = "2022.04.03 23:12:56";       // 마지막 감지된 시간
+    private String last_detection_time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));       // 마지막 감지된 시간
 
     public ModuleAccount() { }
 

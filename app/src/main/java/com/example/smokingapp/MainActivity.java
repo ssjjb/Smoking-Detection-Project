@@ -1,17 +1,24 @@
 package com.example.smokingapp;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -29,9 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private String[] titles = new String[]{"My Module", "Setting", "Log"};
 
     private DatabaseReference mDatabaseRef;
-    private Context context;
+    public static Context context;
 
-    FloatingActionButton floatingActionButton;
     ViewPager2 viewPager;
     FragmentStateAdapter pagerAdapter;
     TabLayout tablayout;
@@ -48,26 +54,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        context = getApplicationContext();
+        context = this;
         viewCasting();
 
         // firebase 추가 코드
         mAuth = FirebaseAuth.getInstance();
         User = mAuth.getCurrentUser();
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference("SmokingApp");
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference("SmokingApp/UserAccount/" + User.getUid());
 
         pagerAdapter = new MyPagerAdapter(this);
         viewPager.setAdapter(pagerAdapter);
         new TabLayoutMediator(tablayout, viewPager, (tab, position) -> tab.setText(titles[position])).attach();
 
-        // floating action setting
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent fab_intent = new Intent(MainActivity.this, FabActivity.class);
-                startActivity(fab_intent);
-            }
-        });
 
         // firebase logout
         /*logout.setOnClickListener(new View.OnClickListener() {
@@ -112,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
          */
     }
     private void viewCasting(){
-        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
         viewPager = (ViewPager2) findViewById(R.id.main_viewpager);
         tablayout = (TabLayout) findViewById(R.id.main_tab);
 
@@ -180,4 +177,57 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+    public void addModule(){
+        final EditText et = new EditText(context);
+        final EditText et2 = new EditText(context);
+        et.setTextColor(Color.parseColor("#000000"));
+        et2.setTextColor(Color.parseColor("#000000"));
+        et.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.black));
+        et2.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.black));
+        et.setHintTextColor(getResources().getColor(R.color.gray));
+        et2.setHintTextColor(getResources().getColor(R.color.gray));
+        et.setHint("Module Name");
+        et2.setHint("IP address");
+        et.setMaxLines(1);
+        et2.setMaxLines(1);
+        et.setSingleLine(true);
+        LinearLayout container = new LinearLayout(context);
+        container.setOrientation(LinearLayout.VERTICAL);
+        //container.setBackgroundColor(Color.parseColor("#FFFFFF"));
+        LinearLayout.LayoutParams params = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        et.setLayoutParams(params);
+        et2.setLayoutParams(params);
+        container.addView(et);
+        container.addView(et2);
+        final AlertDialog.Builder alt_bld = new AlertDialog.Builder(context, R.style.MyAlertDialogStyle);
+        alt_bld.setTitle("Add Module").setMessage("Enter Information").setCancelable(false).setView(container).setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        String moduleName = et.getText().toString();
+                        String ipAddress = et2.getText().toString();
+                        ModuleAccount module_Account = new ModuleAccount();
+
+                        if(!moduleName.equals("")){
+                            mDatabaseRef.child("module_list").child(moduleName);
+                            mDatabaseRef.child("module_list").child(moduleName).setValue(module_Account);
+                        }
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        final AlertDialog alert = alt_bld.create();
+        alert.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                alert.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.black));
+                alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
+            }
+        });
+        alert.show();
+    }
+
 }

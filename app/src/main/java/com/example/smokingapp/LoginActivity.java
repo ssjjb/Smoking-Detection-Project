@@ -84,8 +84,8 @@ public class LoginActivity extends AppCompatActivity {
         context = getApplicationContext();
         viewCasting();
 
-        // login_email.setText("w0995g@gmail.com");
-        // login_password.setText("asdfasdf");
+        loginEmail.setText("w0995g@gmail.com");
+        loginPassword.setText("asdfasdf");
 
         // get FireBase Data
         mAuth = FirebaseAuth.getInstance();

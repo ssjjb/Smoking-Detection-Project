@@ -49,6 +49,7 @@ import java.util.Comparator;
 import java.util.Date;
 
 public class DataActivity extends AppCompatActivity {
+    private String IP_ADDRESS = "http://192.168.137.100:8080/video";
 
     ArrayList<DetectionData> data;
     ArrayList<DetectionData> total_data;
@@ -286,6 +287,7 @@ public class DataActivity extends AppCompatActivity {
                 break;
             case R.id.data_realtime:
                 Intent t = new Intent(this, CameraActivity.class);
+                t.putExtra("ip_address", IP_ADDRESS);
                 startActivity(t);
                 break;
         }

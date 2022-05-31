@@ -25,10 +25,9 @@ public class FabActivity extends AppCompatActivity {
     private int device_width = 0;
     private int device_height = 0;
 
-    FloatingActionButton fab_main, fab_setting;
-    TextView fab_setting_txt;
-    TextView Module_name_txt, add_Module;
-    Animation fab_open, fab_close, rotate_forward, rotate_backward, activity_finish;
+    FloatingActionButton fabMain, fabSetting;
+    TextView fabSettingText;
+    Animation fabOpen, fabClose, rotateForward, rotateBackward, activity_finish;
     View.OnClickListener mClickLST;
 
     String tmp_Module_name;
@@ -38,7 +37,7 @@ public class FabActivity extends AppCompatActivity {
 
     private FirebaseAuth User;
     private DatabaseReference mDatabaseRef;
-    ModuleAccount module_Account = new ModuleAccount();  // DB위한 객체
+
     SmokingPerson SmokingPerson = new SmokingPerson(); // 흡연 탐지를 위한 객체
     boolean isOpen = false;
     @Override
@@ -59,33 +58,8 @@ public class FabActivity extends AppCompatActivity {
                 switch(view.getId())
                 {
                     case R.id.fab_setting:
-
-                        AlertDialog.Builder d = new AlertDialog.Builder(FabActivity.this);
-
-                        d.setTitle("");
-
-                        v_d = (View) View.inflate(FabActivity.this, R.layout.dialog_add_module, null);
-                        d.setView(v_d);
-
-                        d.setPositiveButton("Add",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        add_Module = (EditText) v_d.findViewById(R.id.add_Module);
-
-                                        if(add_Module.toString().length()!=0){
-                                            tmp_Module_name = add_Module.getText().toString();
-                                            Log.i("FabActivity",mDatabaseRef.toString());
-                                            mDatabaseRef.child("module_list").child(tmp_Module_name);
-                                            mDatabaseRef.child("module_list").child(tmp_Module_name).setValue(module_Account);
-                                            finish();
-
-                                        }
-
-                                    }
-                                });
-
-                        d.show();
+                        finish();
+                        ((MainActivity)MainActivity.context).addModule();
                         break;
                 }
             }
@@ -93,24 +67,21 @@ public class FabActivity extends AppCompatActivity {
 
 
 
-        fab_main = (FloatingActionButton) findViewById(R.id.fab_main);
-        fab_setting = (FloatingActionButton) findViewById(R.id.fab_setting);
+        fabMain = (FloatingActionButton) findViewById(R.id.fab_main);
+        fabSetting = (FloatingActionButton) findViewById(R.id.fab_setting);
 
-        fab_setting.setOnClickListener(mClickLST);
-
-        fab_setting_txt = (TextView) findViewById(R.id.fab_setting_txt);
-        Module_name_txt = (TextView) findViewById(R.id.Module_name_txt);
-        add_Module = (EditText) findViewById(R.id.add_Module);
+        fabSetting.setOnClickListener(mClickLST);
+        fabSettingText = (TextView) findViewById(R.id.fab_setting_txt);
 
 
-        fab_open = AnimationUtils.loadAnimation(this, R.anim.fab_open);
-        fab_close = AnimationUtils.loadAnimation(this, R.anim.fab_close);
-        rotate_forward = AnimationUtils.loadAnimation(this, R.anim.rotate_forward);
-        rotate_backward = AnimationUtils.loadAnimation(this, R.anim.rotate_backward);
+        fabOpen = AnimationUtils.loadAnimation(this, R.anim.fab_open);
+        fabClose = AnimationUtils.loadAnimation(this, R.anim.fab_close);
+        rotateForward = AnimationUtils.loadAnimation(this, R.anim.rotate_forward);
+        rotateBackward = AnimationUtils.loadAnimation(this, R.anim.rotate_backward);
 
 
 
-        rotate_forward.setAnimationListener(new Animation.AnimationListener() {
+        rotateForward.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
             }
@@ -125,7 +96,7 @@ public class FabActivity extends AppCompatActivity {
         });
 
         action();
-        fab_main.setOnClickListener(new View.OnClickListener() {
+        fabMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 action();
@@ -158,17 +129,17 @@ public class FabActivity extends AppCompatActivity {
 
     private void action(){
         if(isOpen){
-            fab_main.startAnimation(rotate_forward);
-            fab_setting.startAnimation(fab_close);
-            fab_setting_txt.startAnimation(fab_close);
-            fab_setting.setClickable(false);
+            fabMain.startAnimation(rotateForward);
+            fabSetting.startAnimation(fabClose);
+            fabSettingText.startAnimation(fabClose);
+            fabSetting.setClickable(false);
             isOpen = false;
         }
         else{
-            fab_main.startAnimation(rotate_backward);
-            fab_setting.startAnimation(fab_open);
-            fab_setting_txt.startAnimation(fab_open);
-            fab_setting.setClickable(true);
+            fabMain.startAnimation(rotateBackward);
+            fabSetting.startAnimation(fabOpen);
+            fabSettingText.startAnimation(fabOpen);
+            fabSetting.setClickable(true);
             isOpen = true;
         }
     }
