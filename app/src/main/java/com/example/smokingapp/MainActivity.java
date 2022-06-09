@@ -11,11 +11,9 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -23,13 +21,17 @@ import android.widget.LinearLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
     private static final int NUM_PAGES = 3;
@@ -49,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseUser User;
 
+    String email;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +69,20 @@ public class MainActivity extends AppCompatActivity {
         pagerAdapter = new MyPagerAdapter(this);
         viewPager.setAdapter(pagerAdapter);
         new TabLayoutMediator(tablayout, viewPager, (tab, position) -> tab.setText(titles[position])).attach();
+
+
+
+        mDatabaseRef.child("emailId").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                email = snapshot.getValue(String.class);
+                Log.e("email", email);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
 
         // firebase logout
@@ -208,10 +226,20 @@ public class MainActivity extends AppCompatActivity {
                         String moduleName = et.getText().toString();
                         String ipAddress = et2.getText().toString();
                         ModuleAccount module_Account = new ModuleAccount();
+                        module_Account.setIp_address(ipAddress);
 
                         if(!moduleName.equals("")){
                             mDatabaseRef.child("module_list").child(moduleName);
                             mDatabaseRef.child("module_list").child(moduleName).setValue(module_Account);
+                            try{
+                                HttpConnectModule postData = new HttpConnectModule(email, moduleName, ipAddress);
+                                String receive = postData.execute().get();
+                                Log.e("receive", receive);
+                            } catch(InterruptedException e){
+                                e.printStackTrace();
+                            } catch (ExecutionException e){
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

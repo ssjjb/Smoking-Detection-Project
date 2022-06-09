@@ -34,6 +34,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 public class LoginActivity extends AppCompatActivity {
@@ -448,6 +449,16 @@ public class LoginActivity extends AppCompatActivity {
                                 user_account.setName(name);
 
                                 mDatabaseRef.child("UserAccount").child(user.getUid()).setValue(user_account);
+
+                                try{
+                                    HttpConnetUser postData = new HttpConnetUser(signUpEmail.getText().toString(), signUpPassword.getText().toString(), signUpName.getText().toString());
+                                    String receive = postData.execute().get();
+
+                                } catch(InterruptedException e){
+                                    e.printStackTrace();
+                                } catch (ExecutionException e){
+                                    e.printStackTrace();
+                                }
 
                                 signUpName.setText("");
                                 signUpEmail.setText("");

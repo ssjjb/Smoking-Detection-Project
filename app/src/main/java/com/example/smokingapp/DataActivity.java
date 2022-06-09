@@ -49,7 +49,7 @@ import java.util.Comparator;
 import java.util.Date;
 
 public class DataActivity extends AppCompatActivity {
-    private String IP_ADDRESS = "http://192.168.137.100:8080/video";
+    private String IP_ADDRESS = "";
 
     ArrayList<DetectionData> data;
     ArrayList<DetectionData> total_data;
@@ -75,9 +75,10 @@ public class DataActivity extends AppCompatActivity {
         @Override
         public void onDataChange(@NonNull DataSnapshot snapshot) {
             Log.i("DataActivity", "Snapshot = " + snapshot.toString());
-            Log.i("DataActivity", snapshot.child("day_detection_person").getValue().toString());
+            //Log.i("DataActivity", snapshot.child("day_detection_person").getValue().toString());
             //data_person_day_num.setText(snapshot.child("day_detection_person").getValue().toString());
             data_person_total_num.setText(snapshot.child("total_detection_person").getValue().toString());
+            IP_ADDRESS = snapshot.child("ip_address").getValue().toString();
         }
 
         @Override

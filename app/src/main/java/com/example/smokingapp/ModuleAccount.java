@@ -9,6 +9,7 @@ import java.util.Date;
 
 public class ModuleAccount {
 
+    private String ip_address = "";
     private int day_detection_person = 0;         // 오늘 감지된 사람 수
     private int total_detection_person = 0;       // 전체 감지된 사람 수
     private String last_detection_time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));       // 마지막 감지된 시간
@@ -37,5 +38,13 @@ public class ModuleAccount {
 
     public String getLast_detection_time() {
         return last_detection_time;
+    }
+
+    public String getIp_address() {
+        return ip_address;
+    }
+
+    public void setIp_address(String ip_address) {
+        this.ip_address = ip_address;
     }
 }
