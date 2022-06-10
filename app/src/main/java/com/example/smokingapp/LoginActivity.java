@@ -33,6 +33,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
@@ -407,12 +408,22 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     FirebaseUser user = mAuth.getCurrentUser();
                     if (user.isEmailVerified()) {
-                        Intent t = new Intent(getApplicationContext(), MainActivity.class);
-                        startActivity(t);
-                        finish();
+                        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+                            @Override
+                            public void onComplete(@NonNull Task<String> task) {
+                                if (!task.isSuccessful()){
+                                    return;
+                                }
+                                String token = task.getResult();
+                                mDatabaseRef.child("UserAccount").child(user.getUid()).child("token").setValue(token);
+                                Intent t = new Intent(getApplicationContext(), MainActivity.class);
+                                startActivity(t);
+                                finish();
 
-                        loginEmail.setText("");
-                        loginPassword.setText("");
+                                loginEmail.setText("");
+                                loginPassword.setText("");
+                            }
+                        });
                     }
                     else{
                         // check generate-email
@@ -451,7 +462,7 @@ public class LoginActivity extends AppCompatActivity {
                                 mDatabaseRef.child("UserAccount").child(user.getUid()).setValue(user_account);
 
                                 try{
-                                    HttpConnetUser postData = new HttpConnetUser(signUpEmail.getText().toString(), signUpPassword.getText().toString(), signUpName.getText().toString());
+                                    HttpConnectUser postData = new HttpConnectUser(signUpEmail.getText().toString(), signUpPassword.getText().toString(), signUpName.getText().toString());
                                     String receive = postData.execute().get();
 
                                 } catch(InterruptedException e){

@@ -13,12 +13,12 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-public class HttpConnetUser extends AsyncTask<String, Void, String> {
+public class HttpConnectUser extends AsyncTask<String, Void, String> {
     String clientKey = "####";
     private String str, receiveMsg;
     private String email, password, name;
 
-    HttpConnetUser(String email, String password, String name){
+    HttpConnectUser(String email, String password, String name){
         this.email = email;
         this.password = password;
         this.name = name;

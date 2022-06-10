@@ -25,6 +25,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +47,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 public class SettingAdapter extends RecyclerView.Adapter<SettingAdapter.ViewHolder> {
     private ArrayList<Setting> m_data;
@@ -95,42 +97,49 @@ public class SettingAdapter extends RecyclerView.Adapter<SettingAdapter.ViewHold
                 @Override
                 public void onClick(View view) {
                     int pos = getAdapterPosition();
-                    if(pos==1){
+                    if(pos==1) {
                         //Toast.makeText(context, m_data.get(getAdapterPosition()).getTitle(), Toast.LENGTH_SHORT).show();
-                        final EditText etname = new EditText(context);
-                        if(pos!=RecyclerView.NO_POSITION) {
-                            etname.setHint("Enter your name");
-                            etname.setTextColor(Color.parseColor("#FFFFFF"));
-                            //et.setPadding(0,context.getResources().getDimensionPixelSize(R.dimen.dialog_top_margin),0,0);
-
-                            FrameLayout container = new FrameLayout(context);
-                            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                            params.leftMargin = context.getResources().getDimensionPixelSize(R.dimen.dialog_margin);
-                            params.rightMargin = context.getResources().getDimensionPixelSize(R.dimen.dialog_margin);
-                            etname.setLayoutParams(params);
-
-                            container.addView(etname);
-
-                            final AlertDialog.Builder alt_bld = new AlertDialog.Builder(context, R.style.dialog_style);
-                            alt_bld.setTitle("Modify").setMessage("Please enter a name.").setIcon(R.drawable.ic_setting_name).setCancelable(false).setView(container).setPositiveButton("OK",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            // 수정 완료
-                                            String edit_info = etname.getText().toString();
+                        final EditText et = new EditText(context);
+                        et.setTextColor(Color.parseColor("#000000"));
+                        et.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.black));
+                        et.setHintTextColor(context.getResources().getColor(R.color.gray));
+                        et.setHint("Account Name");
+                        et.setMaxLines(1);
+                        et.setSingleLine(true);
+                        LinearLayout container = new LinearLayout(context);
+                        container.setOrientation(LinearLayout.VERTICAL);
+                        //container.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        params.leftMargin = context.getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+                        params.rightMargin = context.getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+                        et.setLayoutParams(params);
+                        container.addView(et);
+                        final AlertDialog.Builder alt_bld = new AlertDialog.Builder(context, R.style.MyAlertDialogStyle);
+                        alt_bld.setTitle("Edit Name").setMessage("Enter Name").setCancelable(false).setView(container).setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        if(!et.getText().toString().equals("")) {
+                                            String edit_info = et.getText().toString();
                                             DatabaseReference editname = FirebaseDatabase.getInstance().getReference("SmokingApp/UserAccount/" + User.getUid() + "/name");
                                             editname.setValue(edit_info);
-
                                         }
-                                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-
-                                }
-                            });
-                            final AlertDialog alert = alt_bld.create();
-                            alert.show();
-                        }
+                                    }
+                                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        });
+                        final AlertDialog alert = alt_bld.create();
+                        alert.setOnShowListener(new DialogInterface.OnShowListener() {
+                            @Override
+                            public void onShow(DialogInterface dialogInterface) {
+                                alert.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(context.getResources().getColor(R.color.black));
+                                alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(context.getResources().getColor(R.color.black));
+                            }
+                        });
+                        alert.show();
                     }
+
 
                     else if(pos==2){
                         mAuth.signOut();

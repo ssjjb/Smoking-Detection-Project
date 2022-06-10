@@ -15,9 +15,11 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
@@ -25,16 +27,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     private ArrayList<Module> m_data;
     TextView title, time, person, smoking;
     ConstraintLayout layout;
     Context context;
+    String email = ((MainActivity) MainActivity.context).email;
 
     // firebase 인증 객체 선언
     private FirebaseAuth mAuth;
@@ -63,8 +70,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                     int pos = getAdapterPosition();
                     if (pos != RecyclerView.NO_POSITION) {
                         Intent t = new Intent(context, DataActivity.class);
-                        t.putExtra("key", m_data.get(pos).getTitle());
-                        Log.i("MainAdapter", "key : " + m_data.get(pos).getTitle());
+                        t.putExtra("key", m_data.get(pos).getModuleUID());
                         context.startActivity(t);
                     }
                 }
@@ -86,55 +92,87 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
             public boolean onMenuItemClick(MenuItem menuItem) {
 
                 String module_name = m_data.get(getAdapterPosition()).getTitle();
-                String module_time = m_data.get(getAdapterPosition()).getTime();
-                int module_person = m_data.get(getAdapterPosition()).getDetected_person();
-                int moudle_smokingperson = m_data.get(getAdapterPosition()).getDetected_smoking();
+                String ip_address = m_data.get(getAdapterPosition()).getIp_address();
 
                 switch (menuItem.getItemId()){
                     case 1001:
-                        /*
-                        Toast.makeText(context, m_data.get(getAdapterPosition()).getTitle(), Toast.LENGTH_SHORT).show();
                         final EditText et = new EditText(context);
-                        final int pos = getAdapterPosition();
-                        if(pos!=RecyclerView.NO_POSITION) {
-                            et.setHint("Enter module name");
-                            et.setTextColor(Color.parseColor("#FFFFFF"));
-                            //et.setPadding(0,context.getResources().getDimensionPixelSize(R.dimen.dialog_top_margin),0,0);
+                        final EditText et2 = new EditText(context);
+                        et.setTextColor(Color.parseColor("#000000"));
+                        et2.setTextColor(Color.parseColor("#000000"));
+                        et.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.black));
+                        et2.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.black));
+                        et.setHintTextColor(context.getResources().getColor(R.color.gray));
+                        et2.setHintTextColor(context.getResources().getColor(R.color.gray));
+                        et.setHint("Module Name");
+                        et2.setHint("IP address");
+                        et.setMaxLines(1);
+                        et2.setMaxLines(1);
+                        et.setSingleLine(true);
+                        et.setText(module_name);
+                        et2.setText(ip_address);
+                        LinearLayout container = new LinearLayout(context);
+                        container.setOrientation(LinearLayout.VERTICAL);
+                        //container.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                        LinearLayout.LayoutParams params = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        params.leftMargin = context.getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+                        params.rightMargin = context.getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+                        et.setLayoutParams(params);
+                        et2.setLayoutParams(params);
+                        container.addView(et);
+                        container.addView(et2);
+                        final AlertDialog.Builder alt_bld = new AlertDialog.Builder(context, R.style.MyAlertDialogStyle);
+                        alt_bld.setTitle("Edit Module").setMessage("Enter Information").setCancelable(false).setView(container).setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // 수정 완료
+                                        String name = et.getText().toString();
+                                        String ip = et2.getText().toString();
 
-                            FrameLayout container = new FrameLayout(context);
-                            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                            params.leftMargin = context.getResources().getDimensionPixelSize(R.dimen.dialog_margin);
-                            params.rightMargin = context.getResources().getDimensionPixelSize(R.dimen.dialog_margin);
-                            et.setLayoutParams(params);
+                                        DatabaseReference edit_module_name = mDatabaseRef.child(User.getUid().toString()).child("module_list").child(m_data.get(getAdapterPosition()).getModuleUID());
+                                        edit_module_name.child("name").setValue(name);
+                                        edit_module_name.child("ip_address").setValue(ip);
+                                        Log.e("email", email);
 
-                            container.addView(et);
-
-                            final AlertDialog.Builder alt_bld = new AlertDialog.Builder(context, R.style.dialog_style);
-                            alt_bld.setTitle("Modify").setMessage("Please enter a correction.").setIcon(R.drawable.ic_setting_name).setCancelable(false).setView(container).setPositiveButton("OK",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            // 수정 완료
-                                            String message = et.getText().toString();
-                                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-                                            DatabaseReference edit_module_name = mDatabaseRef.child(User.getUid().toString()).child("module_list").child(module_name);
+                                        try{
+                                            HttpConnectModule postData = new HttpConnectModule(email, name, ip, 2, module_name);
+                                            String receive = postData.execute().get();
+                                            Log.e("receive", receive);
+                                        } catch(InterruptedException e){
+                                            e.printStackTrace();
+                                        } catch (ExecutionException e){
+                                            e.printStackTrace();
                                         }
-                                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
 
-                                }
-                            });
-                            final AlertDialog alert = alt_bld.create();
-                            alert.show();
-                        }
-                      
-                         */ //edit 코드 key값을 모듈이름으로 한 관계로 아직 미구현
-                        Toast.makeText(context, "edit", Toast.LENGTH_SHORT).show();
+                                        m_data.get(getAdapterPosition()).setTitle(name);
+                                        m_data.get(getAdapterPosition()).setIp_address(ip);
+                                    }
+                                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        });
+                        final AlertDialog alert = alt_bld.create();
+                        alert.setOnShowListener(new DialogInterface.OnShowListener() {
+                            @Override
+                            public void onShow(DialogInterface dialogInterface) {
+                                alert.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(context.getResources().getColor(R.color.black));
+                                alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(context.getResources().getColor(R.color.black));
+                            }
+                        });
+                        alert.show();
                         break;
                     case 1002:
-                        Toast.makeText(context, "delete", Toast.LENGTH_SHORT).show();
-                        mDatabaseRef.child(User.getUid().toString()).child("module_list").child(module_name).setValue(null);
-                        Toast.makeText(context, "Delete success", Toast.LENGTH_SHORT).show();
+                        mDatabaseRef.child(User.getUid().toString()).child("module_list").child(m_data.get(getAdapterPosition()).getModuleUID()).setValue(null);
+                        try{
+                            HttpConnectModule postData = new HttpConnectModule(email, module_name, ip_address, 3, module_name);
+                            String receive = postData.execute().get();
+                            Log.e("receive", receive);
+                        } catch(InterruptedException e){
+                            e.printStackTrace();
+                        } catch (ExecutionException e){
+                            e.printStackTrace();
+                        }
                         break;
                 }
                 return true;

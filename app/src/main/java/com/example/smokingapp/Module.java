@@ -8,14 +8,18 @@ public class Module {
     int detected_person;
     int detected_smoking;
     int color;
+    String ip_address;
+    String moduleUID;
 
 
-    public Module(String title, String time, int detected_person, int detected_smoking, int color) {
+    public Module(String title, String time, int detected_person, int detected_smoking, int color, String ip_address, String moduleUID) {
         this.title = title;
         this.time = time;
         this.detected_person = detected_person;
         this.detected_smoking = detected_smoking;
         this.color = color;
+        this.ip_address = ip_address;
+        this.moduleUID = moduleUID;
     }
 
 
@@ -56,5 +60,21 @@ public class Module {
 
     public void setColor(int color) {
         this.color = color;
+    }
+
+    public String getIp_address() {
+        return ip_address;
+    }
+
+    public void setIp_address(String ip_address) {
+        this.ip_address = ip_address;
+    }
+
+    public String getModuleUID() {
+        return moduleUID;
+    }
+
+    public void setModuleUID(String moduleUID) {
+        this.moduleUID = moduleUID;
     }
 }

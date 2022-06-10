@@ -124,15 +124,15 @@ public class FragmentModule extends Fragment {
 
                 for (DataSnapshot userSnapshot : snapshot.child("module_list").getChildren()){
 
-                    // Child 찍어보기
-                    Log.i("FragmentModule", snapshot.child("module_list").getChildren().toString());
-
+                    String moduleUID = userSnapshot.getKey();
+                    String title = userSnapshot.child("name").getValue().toString();
                     String time = userSnapshot.child("last_detection_time").getValue().toString();
                     int detected_person=Integer.parseInt(userSnapshot.child("day_detection_person").getValue().toString());
                     int detected_smoking =Integer.parseInt(userSnapshot.child("total_detection_person").getValue().toString());
+                    String ip = userSnapshot.child("ip_address").getValue().toString();
                     color = (int)((Math.random()*10000)%4) + 1;
 
-                    data.add(new Module(userSnapshot.getKey(),time,detected_person,detected_smoking,3));
+                    data.add(new Module(title,time,detected_person,detected_smoking,3, ip, moduleUID));
                 }
 
 

@@ -225,14 +225,12 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         String moduleName = et.getText().toString();
                         String ipAddress = et2.getText().toString();
-                        ModuleAccount module_Account = new ModuleAccount();
-                        module_Account.setIp_address(ipAddress);
+                        ModuleAccount module_Account = new ModuleAccount(moduleName, ipAddress);
 
                         if(!moduleName.equals("")){
-                            mDatabaseRef.child("module_list").child(moduleName);
-                            mDatabaseRef.child("module_list").child(moduleName).setValue(module_Account);
+                            mDatabaseRef.child("module_list").push().setValue(module_Account);
                             try{
-                                HttpConnectModule postData = new HttpConnectModule(email, moduleName, ipAddress);
+                                HttpConnectModule postData = new HttpConnectModule(email, moduleName, ipAddress, 1, moduleName);
                                 String receive = postData.execute().get();
                                 Log.e("receive", receive);
                             } catch(InterruptedException e){

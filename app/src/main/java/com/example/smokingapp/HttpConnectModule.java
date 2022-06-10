@@ -16,28 +16,25 @@ import java.net.URLEncoder;
 public class HttpConnectModule extends AsyncTask<String, Void, String> {
     String clientKey = "####";
     private String str, receiveMsg;
-    private String email, name, ipAddress;
+    private String email, name, ipAddress, preName;
+    private int flag;
 
-    HttpConnectModule(String email, String name, String ipAddress){
+    HttpConnectModule(String email, String name, String ipAddress, int flag, String preName){
         this.email = email;
         this.name = name;
         this.ipAddress = ipAddress;
+        this.flag = flag;
+        this.preName = preName;
     }
 
     @Override
     protected String doInBackground(String... params){
         HttpURLConnection conn = null;
+        URL url = null;
+        StringBuilder sb = new StringBuilder();
         try{
-            URL url = new URL("http://10.1.4.122/uploadModule");
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
-            conn.setConnectTimeout(10000);
-            conn.setReadTimeout(10000);
-            conn.setRequestMethod("POST");
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
+            url = new URL("http://10.1.4.122/moduleFunction");
 
-            StringBuilder sb = new StringBuilder();
             sb.append(URLEncoder.encode((String) "email", "UTF-8"));
             sb.append('=');
             sb.append(URLEncoder.encode((String) email, "UTF-8"));
@@ -49,7 +46,22 @@ public class HttpConnectModule extends AsyncTask<String, Void, String> {
             sb.append(URLEncoder.encode((String) "ip", "UTF-8"));
             sb.append('=');
             sb.append(URLEncoder.encode((String) ipAddress, "UTF-8"));
+            sb.append('&');
+            sb.append(URLEncoder.encode((String) "flag", "UTF-8"));
+            sb.append('=');
+            sb.append(URLEncoder.encode((String) Integer.toString(flag), "UTF-8"));
+            sb.append('&');
+            sb.append(URLEncoder.encode((String) "preName", "UTF-8"));
+            sb.append('=');
+            sb.append(URLEncoder.encode((String) preName, "UTF-8"));
 
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
 
             OutputStream os = conn.getOutputStream();
             os.write(sb.toString().getBytes("UTF-8"));
@@ -64,7 +76,6 @@ public class HttpConnectModule extends AsyncTask<String, Void, String> {
                     buffer.append(str);
                 }
                 receiveMsg = buffer.toString();
-
                 reader.close();
                 tmp.close();
             } else{
