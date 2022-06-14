@@ -10,6 +10,7 @@ import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -41,6 +42,8 @@ import java.util.regex.Pattern;
 public class LoginActivity extends AppCompatActivity {
     private static final boolean LOGIN = true;
     private static final boolean SIGNUP = false;
+    private SharedPreferences appData;
+    private String flaskIP = "";
 
     private Context context;
 
@@ -88,6 +91,8 @@ public class LoginActivity extends AppCompatActivity {
 
         loginEmail.setText("w0995g@gmail.com");
         loginPassword.setText("asdfasdf");
+        appData = getSharedPreferences("appData", MODE_PRIVATE);
+        flaskIP = appData.getString("ip", "");
 
         // get FireBase Data
         mAuth = FirebaseAuth.getInstance();
@@ -462,7 +467,7 @@ public class LoginActivity extends AppCompatActivity {
                                 mDatabaseRef.child("UserAccount").child(user.getUid()).setValue(user_account);
 
                                 try{
-                                    HttpConnectUser postData = new HttpConnectUser(signUpEmail.getText().toString(), signUpPassword.getText().toString(), signUpName.getText().toString());
+                                    HttpConnectUser postData = new HttpConnectUser(signUpEmail.getText().toString(), signUpPassword.getText().toString(), signUpName.getText().toString(), flaskIP);
                                     String receive = postData.execute().get();
 
                                 } catch(InterruptedException e){

@@ -9,27 +9,38 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.animation.Easing;
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -43,16 +54,21 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class DataActivity extends AppCompatActivity {
     private String IP_ADDRESS = "";
 
     ArrayList<DetectionData> data;
     ArrayList<DetectionData> total_data;
+    ArrayList<BarEntry> entries = new ArrayList<>();
+    ArrayList<String> xLabel = new ArrayList<>();
+    ArrayList<Integer> chartData = new ArrayList<>();
     private Thread thread;
     int today_detection_person = 0;
     String current_day = "";
@@ -61,7 +77,7 @@ public class DataActivity extends AppCompatActivity {
     TextView data_chart_day;
     RecyclerView detail_content;
     DataAdapter adapter;
-    LineChart chart;
+    BarChart chart;
     Toolbar tb;
     Context context;
 
@@ -105,10 +121,19 @@ public class DataActivity extends AppCompatActivity {
         User = mAuth.getCurrentUser();
         mDatabaseRef = FirebaseDatabase.getInstance().getReference("SmokingApp/UserAccount/" + User.getUid()+"/module_list" + "/"+key);
 
+        //id find
+        detail_content = (RecyclerView) findViewById(R.id.data_detail_content);
+        tb = (Toolbar) findViewById(R.id.data_toolbar);
+        chart = (BarChart) findViewById(R.id.data_chart);
+        data_chart_day = (TextView) findViewById(R.id.data_chart_day);
+
         //data 선언
         data = new ArrayList<>();
         total_data = new ArrayList<>();
+        chartInit();
         init();
+
+        showLoading();
 
         // module info
         data_person_day_num = (TextView) findViewById(R.id.data_person_day_num);
@@ -117,67 +142,18 @@ public class DataActivity extends AppCompatActivity {
         if(key != null)
             mDatabaseRef.addValueEventListener(listener);
 
-        //id find
-        detail_content = (RecyclerView) findViewById(R.id.data_detail_content);
-        tb = (Toolbar) findViewById(R.id.data_toolbar);
-        chart = (LineChart) findViewById(R.id.data_chart);
-        data_chart_day = (TextView) findViewById(R.id.data_chart_day);
-
         // recent adapter
         detail_content.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DataAdapter(data);
         detail_content.setAdapter(adapter);
         detail_content.startLayoutAnimation();
 
+
         // toolbar
         setSupportActionBar(tb);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // chart
-        chart.fitScreen();
-        chart.getDescription().setEnabled(false);
-        // chart.setDrawBorders(true);
-        // chart.setBorderWidth(2f);
-        //chart.setDrawGridBackground(true);
-
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-
-        xAxis.setLabelCount(6);
-        xAxis.setTextSize(16);
-        xAxis.setDrawGridLines(true);
-        xAxis.setGridLineWidth(1f);
-        xAxis.setAxisLineWidth(1f);
-        xAxis.setGridColor(getResources().getColor(R.color.chart_grid_color));
-        Typeface tf = Typeface.createFromAsset(getAssets(), "font/gelion_semibold.ttf");
-        xAxis.setTypeface(tf);
-
-
-        Legend legend = chart.getLegend();
-        legend.setEnabled(false);
-
-        YAxis leftAxis = chart.getAxisLeft();
-        leftAxis.setDrawLabels(false);
-        leftAxis.setDrawGridLines(true);
-        leftAxis.setGridColor(getResources().getColor(R.color.chart_grid_color));
-        leftAxis.setGridLineWidth(1f);
-        leftAxis.setAxisLineWidth(1f);
-
-        YAxis rightAxis = chart.getAxisRight();
-        rightAxis.setEnabled(false);
-
-        LineData data = new LineData();
-        chart.setData(data);
-
-        addEntry();
-        addEntry();
-        addEntry();
-        addEntry();
-        addEntry();
-        addEntry();
-        addEntry();
-        addEntry();
 
         current_day = new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis()));
         change_date(current_day);
@@ -219,6 +195,7 @@ public class DataActivity extends AppCompatActivity {
                         current_day = list[i];
                         change_date(current_day);
                         refresh_view(list[i]);
+                        //updateChart();
                         dialogInterface.dismiss();
                     }
                 });
@@ -229,42 +206,6 @@ public class DataActivity extends AppCompatActivity {
 
     }
 
-    private void addEntry()
-    {
-        LineData data = chart.getData();
-        if(data != null)
-        {
-            ILineDataSet set = data.getDataSetByIndex(0);
-
-            if(set == null)
-            {
-                set = createSet();
-                data.addDataSet(set);
-            }
-            data.addEntry(new Entry(set.getEntryCount(), (float)(Math.random() * 40) + 30f), 0);
-            data.notifyDataChanged();
-
-            chart.notifyDataSetChanged();
-            chart.setVisibleXRangeMaximum(10);
-            chart.moveViewToX(data.getEntryCount());
-        }
-    }
-
-    private LineDataSet createSet() {
-
-        LineDataSet set = new LineDataSet(null, "smoking");
-        set.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        set.setDrawCircleHole(false);
-        set.setDrawCircles(false);
-        set.setDrawFilled(true);
-        set.setDrawValues(false);
-        set.setAxisDependency(YAxis.AxisDependency.LEFT);
-        set.setColor(getResources().getColor(R.color.main_theme_bold));
-        set.setLineWidth(2f);
-        set.setFillAlpha(110);
-        set.setFillDrawable(ContextCompat.getDrawable(this, R.drawable.chart_gradient));
-        return set;
-    }
 
     @Override
     protected void onStop() {
@@ -302,6 +243,7 @@ public class DataActivity extends AppCompatActivity {
                 DetectionData adp_data = new DetectionData(ContextCompat.getDrawable(context, R.drawable.ic_person), temp.getDetection_name(), temp.getDetection_time());
                 total_data.add(adp_data);
                 add_view(adp_data);
+                //updateChart();
             }
 
             @Override
@@ -342,7 +284,6 @@ public class DataActivity extends AppCompatActivity {
         }catch(ParseException e){
 
         }
-
         adapter.notifyDataSetChanged();
     }
     static class DateComparator implements Comparator<String> {
@@ -421,10 +362,93 @@ public class DataActivity extends AppCompatActivity {
                 }
             }
         }catch (ParseException e){
-
+            Log.e("compare", "error");
         }
         data_person_day_num.setText(Integer.toString(today_detection_person));
-        adapter.notifyDataSetChanged();
+        adapter = new DataAdapter(data);
+        detail_content.setAdapter(adapter);
+        detail_content.startLayoutAnimation();
+        updateChart();
+    }
+    private void chartInit(){
+        for(int i =0; i < 25; i++){
+            xLabel.add(Integer.toString(i+1) + "h");
+            entries.add(new BarEntry((Integer) i, 0));
+        }
+        //set axis
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setLabelCount(8);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f);
+        xAxis.setDrawAxisLine(false);
+        chart.getAxisRight().setEnabled(false);
+
+        //set dataset
+        BarDataSet set = new BarDataSet(entries, "Detection Value");
+        set.setColor(getResources().getColor(R.color.main_theme));
+        set.setDrawValues(false);
+
+        BarData barData = new BarData(set);
+        chart.setData(barData);
+        chart.setDescription(null);
+        chart.invalidate();
+
+    }
+    private void updateChart(){
+        BarData barData = chart.getBarData();
+        for(int i =0; i < 25; i++){
+            entries.get(i).setY(0);
+        }
+        Log.e("total", Integer.toString(total_data.size()));
+        for (int i = 0; i < total_data.size(); i++) {
+            try {
+                String today = current_day;
+                Date curDateFullFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(total_data.get(i).getTime());
+                String curDate = new SimpleDateFormat("yyyy-MM-dd").format(curDateFullFormat);
+
+                int result = today.compareTo(curDate);
+                if(result == 0) {
+                    Calendar calendar = GregorianCalendar.getInstance();
+                    calendar.setTime(curDateFullFormat);
+                    int hour = calendar.get(Calendar.HOUR_OF_DAY);
+
+                    entries.get(hour).setY(entries.get(hour).getY() + 1);
+                }
+            }catch (ParseException e){
+            }
+        }
+        float max = 10;
+        for(int i = 0; i < entries.size(); i++){
+            if(entries.get(i).getY() > max)
+                max = entries.get(i).getY();
+            Log.i("entry", Float.toString(entries.get(i).getY()));
+        }
+        YAxis yAxis = chart.getAxisLeft();
+        yAxis.setAxisMinimum(0l);
+        yAxis.setAxisMaximum(max);
+
+        chart.animateY(500, Easing.Linear);
+        chart.setData(barData);
+        chart.invalidate();
+
+        barData.notifyDataChanged();
+        chart.notifyDataSetChanged();
+    }
+    void showLoading(){
+        Dialog progress = new Dialog(DataActivity.this, R.style.LoadingStyle);
+        progress.setCancelable(false);
+        progress.addContentView(new ProgressBar(DataActivity.this), new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        progress.show();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progress.dismiss();
+                updateChart();
+            }
+        },1000);
     }
 
 }

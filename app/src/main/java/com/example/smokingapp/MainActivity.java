@@ -11,6 +11,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,6 +37,8 @@ import java.util.concurrent.ExecutionException;
 public class MainActivity extends AppCompatActivity {
     private static final int NUM_PAGES = 3;
     private String[] titles = new String[]{"My Module", "Setting", "Log"};
+    private String flaskIP = "";
+    private SharedPreferences appData;
 
     private DatabaseReference mDatabaseRef;
     public static Context context;
@@ -59,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         context = this;
+        appData = getSharedPreferences("appData", MODE_PRIVATE);
+        flaskIP = appData.getString("ip", "");
         viewCasting();
 
         // firebase 추가 코드
@@ -230,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
                         if(!moduleName.equals("")){
                             mDatabaseRef.child("module_list").push().setValue(module_Account);
                             try{
-                                HttpConnectModule postData = new HttpConnectModule(email, moduleName, ipAddress, 1, moduleName);
+                                HttpConnectModule postData = new HttpConnectModule(email, moduleName, ipAddress, 1, moduleName, flaskIP);
                                 String receive = postData.execute().get();
                                 Log.e("receive", receive);
                             } catch(InterruptedException e){
@@ -238,6 +243,48 @@ public class MainActivity extends AppCompatActivity {
                             } catch (ExecutionException e){
                                 e.printStackTrace();
                             }
+                        }
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        final AlertDialog alert = alt_bld.create();
+        alert.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                alert.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.black));
+                alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
+            }
+        });
+        alert.show();
+    }
+    public void admin() {
+        final EditText et = new EditText(context);
+        et.setTextColor(Color.parseColor("#000000"));
+        et.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.black));
+        et.setHintTextColor(getResources().getColor(R.color.gray));
+        et.setHint("Module Name");
+        et.setMaxLines(1);
+        et.setSingleLine(true);
+        et.setText(appData.getString("ip", ""));
+        LinearLayout container = new LinearLayout(context);
+        container.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        et.setLayoutParams(params);
+        container.addView(et);
+        final AlertDialog.Builder alt_bld = new AlertDialog.Builder(context, R.style.MyAlertDialogStyle);
+        alt_bld.setTitle("Admin").setMessage("Enter Information").setCancelable(false).setView(container).setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        String adr = et.getText().toString();
+                        if(!adr.equals("")){
+                            SharedPreferences.Editor editor = appData.edit();
+                            editor.putString("ip", adr);
+                            editor.apply();
                         }
                     }
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

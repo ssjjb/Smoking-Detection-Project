@@ -3,6 +3,7 @@ package com.example.smokingapp;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.util.Log;
@@ -42,6 +43,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     ConstraintLayout layout;
     Context context;
     String email = ((MainActivity) MainActivity.context).email;
+    private String flaskIP = "";
+
 
     // firebase 인증 객체 선언
     private FirebaseAuth mAuth;
@@ -134,8 +137,11 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                                         edit_module_name.child("ip_address").setValue(ip);
                                         Log.e("email", email);
 
+                                        SharedPreferences appData = context.getSharedPreferences("appData", Context.MODE_PRIVATE);
+                                        flaskIP = appData.getString("ip", "");
+
                                         try{
-                                            HttpConnectModule postData = new HttpConnectModule(email, name, ip, 2, module_name);
+                                            HttpConnectModule postData = new HttpConnectModule(email, name, ip, 2, module_name, flaskIP);
                                             String receive = postData.execute().get();
                                             Log.e("receive", receive);
                                         } catch(InterruptedException e){
@@ -164,8 +170,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                         break;
                     case 1002:
                         mDatabaseRef.child(User.getUid().toString()).child("module_list").child(m_data.get(getAdapterPosition()).getModuleUID()).setValue(null);
+                        SharedPreferences appData = context.getSharedPreferences("appData", Context.MODE_PRIVATE);
+                        flaskIP = appData.getString("ip", "");
                         try{
-                            HttpConnectModule postData = new HttpConnectModule(email, module_name, ip_address, 3, module_name);
+                            HttpConnectModule postData = new HttpConnectModule(email, module_name, ip_address, 3, module_name, flaskIP);
                             String receive = postData.execute().get();
                             Log.e("receive", receive);
                         } catch(InterruptedException e){

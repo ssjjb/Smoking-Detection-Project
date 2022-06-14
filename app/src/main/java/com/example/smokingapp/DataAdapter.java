@@ -62,4 +62,9 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>{
     public int getItemCount() {
         return detectionData.size() ;
     }
+
+    public void remove(){
+        detectionData.clear();
+        notifyDataSetChanged();
+    }
 }

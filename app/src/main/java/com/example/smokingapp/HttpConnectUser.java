@@ -17,18 +17,20 @@ public class HttpConnectUser extends AsyncTask<String, Void, String> {
     String clientKey = "####";
     private String str, receiveMsg;
     private String email, password, name;
+    private String flaskIP;
 
-    HttpConnectUser(String email, String password, String name){
+    HttpConnectUser(String email, String password, String name, String flaskIP){
         this.email = email;
         this.password = password;
         this.name = name;
+        this.flaskIP = flaskIP;
     }
 
     @Override
     protected String doInBackground(String... params){
         HttpURLConnection conn = null;
         try{
-            URL url = new URL("http://10.1.4.122/uploadUserAccountMariaDB");
+            URL url = new URL("http://" + flaskIP + "/uploadUserAccountMariaDB");
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
             conn.setConnectTimeout(10000);

@@ -18,13 +18,15 @@ public class HttpConnectModule extends AsyncTask<String, Void, String> {
     private String str, receiveMsg;
     private String email, name, ipAddress, preName;
     private int flag;
+    private String flaskIP;
 
-    HttpConnectModule(String email, String name, String ipAddress, int flag, String preName){
+    HttpConnectModule(String email, String name, String ipAddress, int flag, String preName, String flaskIP){
         this.email = email;
         this.name = name;
         this.ipAddress = ipAddress;
         this.flag = flag;
         this.preName = preName;
+        this.flaskIP = flaskIP;
     }
 
     @Override
@@ -33,7 +35,7 @@ public class HttpConnectModule extends AsyncTask<String, Void, String> {
         URL url = null;
         StringBuilder sb = new StringBuilder();
         try{
-            url = new URL("http://10.1.4.122/moduleFunction");
+            url = new URL("http://" + flaskIP + "/moduleFunction");
 
             sb.append(URLEncoder.encode((String) "email", "UTF-8"));
             sb.append('=');

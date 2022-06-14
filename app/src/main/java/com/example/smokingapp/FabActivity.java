@@ -28,6 +28,7 @@ public class FabActivity extends AppCompatActivity {
     private int device_height = 0;
 
     FloatingActionButton fabMain, fabSetting;
+    FloatingActionButton fabAdmin;
     TextView fabSettingText;
     Animation fabOpen, fabClose, rotateForward, rotateBackward, activity_finish;
     View.OnClickListener mClickLST;
@@ -63,6 +64,10 @@ public class FabActivity extends AppCompatActivity {
                         finish();
                         ((MainActivity)MainActivity.context).addModule();
                         break;
+                    case R.id.fab_admin:
+                        finish();
+                        ((MainActivity)MainActivity.context).admin();
+                        break;
                 }
             }
         };
@@ -74,6 +79,9 @@ public class FabActivity extends AppCompatActivity {
 
         fabSetting.setOnClickListener(mClickLST);
         fabSettingText = (TextView) findViewById(R.id.fab_setting_txt);
+
+        fabAdmin = (FloatingActionButton) findViewById(R.id.fab_admin);
+        fabAdmin.setOnClickListener(mClickLST);
 
 
         fabOpen = AnimationUtils.loadAnimation(this, R.anim.fab_open);
@@ -135,6 +143,8 @@ public class FabActivity extends AppCompatActivity {
             fabSetting.startAnimation(fabClose);
             fabSettingText.startAnimation(fabClose);
             fabSetting.setClickable(false);
+            fabAdmin.startAnimation(fabClose);
+            fabAdmin.setClickable(false);
             isOpen = false;
         }
         else{
@@ -142,6 +152,8 @@ public class FabActivity extends AppCompatActivity {
             fabSetting.startAnimation(fabOpen);
             fabSettingText.startAnimation(fabOpen);
             fabSetting.setClickable(true);
+            fabAdmin.startAnimation(fabOpen);
+            fabAdmin.setClickable(true);
             isOpen = true;
         }
     }

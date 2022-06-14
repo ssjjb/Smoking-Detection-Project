@@ -43,5 +43,18 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/fab_main"
         app:layout_constraintEnd_toStartOf="@+id/fab_setting" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_admin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:backgroundTint="@color/main_theme"
+        android:clickable="true"
+        android:visibility="invisible"
+        app:borderWidth="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/fab_setting"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_camera" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
